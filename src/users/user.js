@@ -1,16 +1,21 @@
 
 const express = require("express");
 const bcrypt = require('bcrypt');
-const { validationResult } = require("express-validator");
+const { validationResult, } = require("express-validator");
 const knexdb = require('../../db/dbconnection');
 const router = express.Router();
-const tolowercase=require("lowercase")
-const uuid=require("uuid")
+const uuid = require("uuid");
+const knex = require("knex");
+const jwt=require("jsonwebtoken")
+const {signupvalidation,loginvalidation}=require('../../validation/validation')
+const jwtsecretkey="seretkey"
 
-const register = async (req, res) => {
+
+const signup = async (req, res) => {
+
     try {
-        // Check for validation errors
         const errors = validationResult(req);
+
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
         }
@@ -20,8 +25,8 @@ const register = async (req, res) => {
         console.log(email)
 
 
-            const result = await knexdb('users')    
-                .where('email','=', email).select('email')
+        const result = await knexdb('users')
+            .where('email', '=', email).select('email')
 
         console.log(result)
 
@@ -29,12 +34,12 @@ const register = async (req, res) => {
             return res.status(409).json({ msg: "This user already exists" });
         }
 
-        // Hash the password
-        const passwordHash = await bcrypt.hash(req.body.password, 10);
+        
+        const passwordHash = await bcrypt.hash(req.body.password, 6);
 
 
         await knexdb('users').insert({
-            id:uuid.v6(),
+            id: uuid.v6(),
             name: req.body.name,
             email: req.body.email,
             password: passwordHash,
@@ -48,8 +53,60 @@ const register = async (req, res) => {
         console.error(error);
         res.status(500).json({ msg: 'Server error' });
     }
+
 };
 
-const login =
 
-module.exports = { register };
+
+
+const login = async (req, res) => {
+    try {
+        
+        const errors = validationResult(req);
+        
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+
+    
+        const result = await knexdb('users')
+            .select('*')
+            .where('email', req.body.email);
+
+
+        if (result.length === 0) {
+            return res.status(401).json({ msg: "Authentication required, user not found" });
+        }
+
+        const user = result[0];
+
+        
+        const passwordMatch = await bcrypt.compare(req.body.password, user.password);
+
+        if (!passwordMatch) {
+            return res.status(401).json({ msg: "Authentication error, password is incorrect" });
+        }
+
+        
+        const token = jwt.sign({ id: user.id }, jwtsecretkey, { expiresIn: '1h' });
+
+        
+        return res.status(200).json({
+            msg: "Logged in successfully",
+            token,
+            user: { id: user.id, email: user.email, name: user.name }
+        });
+
+    } catch (error) {
+        console.error("Internal server error:", error);
+        res.status(500).json({ msg: "Server error" });
+    }
+};
+
+module.exports = { login,signup };
+
+
+
+
+
+

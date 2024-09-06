@@ -1,13 +1,14 @@
 
-// const bodyParser = require("body-parser")
 const express=require("express")
 const app=express()
 app.use(express.json())
 const db=require('./db/dbconnection')   
-const {register}=require("./src/users/user")
-const {signupvalidation}=require("./validation/validation")
+const {signup,login}=require("./src/users/user")
+// const {signupvalidation}=require("./validation/validation")
+const { sign } = require("jsonwebtoken")
 
-app.post("/api",register)
+app.post("/signup",signup)
+app.post("/login",login)
 
 
 app.listen(6000,()=>{

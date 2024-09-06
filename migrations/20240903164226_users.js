@@ -8,6 +8,7 @@
            table.string("name").notNullable()
            table.string("email").unique()
            table.string("password").notNullable()
+           
        })
 
 };
