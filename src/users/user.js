@@ -7,7 +7,8 @@ const router = express.Router();
 const uuid = require("uuid");
 const knex = require("knex");
 const jwt=require("jsonwebtoken")
-const {signupvalidation,loginvalidation}=require('../../validation/validation')
+const {signupvalidation,loginvalidation}=require('../../validation/validation');
+const { config } = require("dotenv");
 const jwtsecretkey="seretkey"
 
 
@@ -103,10 +104,19 @@ const login = async (req, res) => {
     }
 };
 
-module.exports = { login,signup };
 
 
 
 
+// const midlewear=async(req,res)=>{
+
+//     const decode=jwt.verify(jwtsecretkey)
+//     const id=req.body.id
+//     console.log(decode)
 
 
+
+// }
+
+
+module.exports = { login,signup};
