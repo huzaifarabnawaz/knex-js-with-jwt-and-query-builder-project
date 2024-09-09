@@ -8,7 +8,8 @@ const uuid = require("uuid");
 const knex = require("knex");
 const jwt = require("jsonwebtoken")
 const { signupvalidation, loginvalidation } = require('../../validation/validation');
-const jwtsecretkey = "seretkey"
+const {jwtsecretkey}=require('../../constants')
+
 
 
 const signup = async (req, res) => {
@@ -59,6 +60,8 @@ const signup = async (req, res) => {
 
 
 
+
+
 const login = async (req, res) => {
     try {
 
@@ -89,7 +92,7 @@ const login = async (req, res) => {
         }
 
 
-        const token = jwt.sign({ id: user.id }, jwtsecretkey, { expiresIn: '1h' });
+        const token = jwt.sign({ id: user.id }, jwtsecretkey, { expiresIn: '2h' });
 
 
         return res.status(200).json({
@@ -106,39 +109,38 @@ const login = async (req, res) => {
 
 
 
+
+
+
+
 const getuser = async (req, res) => {
-    try {
+    // try {
 
-        if (
-            !req.headers.authorization ||
-            !req.headers.authorization.startsWith('Bearer') ||
-            !req.headers.authorization.split(' ')[1]) {
-            return res.status(422).json("please enter valid requerments")
-        }
+        // const auth = await req.headers.authorization.split(' ')[1];
+        // const decode = await jwt.verify(auth, jwtsecretkey)
+        
 
-        const auth = await req.headers.authorization.split(' ')[1]
-        const decode = await jwt.verify(auth, jwtsecretkey)
+        // const [user] = await knexdb('users')
+        //     .select('*')
+        //     .from('users')
+        //     .where('id', '=', decode.id)
 
-        const [user] = await knexdb('users')
-            .select('*')
-            .from('users')
-            .where('id', '=', decode.id)
+        // console.log(user)
 
-        console.log(user)
+    //     if (!user) return res.status(401).json("Aunathorized");
 
-        if (!user) return res.status(401).json("Aunathorized");
+    //      res.status(200).json({ success: true, data: user });
 
-         res.status(200).json({ success: true, data: user });
+    // }
 
-      
-
-    }
-
-    catch (error) {
-        console.log("internel server error ")
-    }
+    // catch (error) {
+    //     console.log("internel server error ")
+    //     throw error
+    // }
 
 }
 
 
-module.exports = { login, signup, getuser };
+
+
+module.exports = { login, signup, getuser};

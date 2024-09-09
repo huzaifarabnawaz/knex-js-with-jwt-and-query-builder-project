@@ -4,13 +4,12 @@ const app=express()
 app.use(express.json())
 const db=require('./db/dbconnection')   
 const {signup,login,getuser}=require("./src/users/user")
-// const {isauthurized}=require('./authvarefication/authvarification')
-
+const {isauth}=require("./authvarification/authvarification")
 
 
 app.post("/signup",signup)
 app.post("/login",login)
-app.get("/getuser",getuser)
+app.get("/getuser",isauth,getuser)
 
 
 
