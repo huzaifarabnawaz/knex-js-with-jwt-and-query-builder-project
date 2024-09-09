@@ -25,9 +25,8 @@ const isauth = async (req, res, next) => {
             .from('users')
             .where('id', '=', id)
 
-        res.send(user)
+            req.user = user
 
-        console.log(user)
 
         next()
 

@@ -74,7 +74,7 @@ const login = async (req, res) => {
 
         const result = await knexdb('users')
             .select('*')
-            .where('email', req.body.email);
+            .where('email','=', req.body.email);
 
         console.log(result)
 
@@ -114,29 +114,17 @@ const login = async (req, res) => {
 
 
 const getuser = async (req, res) => {
-    // try {
+    try {    
 
-        // const auth = await req.headers.authorization.split(' ')[1];
-        // const decode = await jwt.verify(auth, jwtsecretkey)
-        
+         res.status(200).json({ success: true, payload: req.user });
 
-        // const [user] = await knexdb('users')
-        //     .select('*')
-        //     .from('users')
-        //     .where('id', '=', decode.id)
+    }
 
-        // console.log(user)
-
-    //     if (!user) return res.status(401).json("Aunathorized");
-
-    //      res.status(200).json({ success: true, data: user });
-
-    // }
-
-    // catch (error) {
-    //     console.log("internel server error ")
-    //     throw error
-    // }
+    catch (error) {
+        console.log(error)
+        console.log("internel server error ")
+        throw error
+    }
 
 }
 
