@@ -13,4 +13,6 @@ const loginvalidation=[
 ]
 
 
+
+
 module.exports={signupvalidation,loginvalidation}

@@ -6,10 +6,9 @@ const knexdb = require('../../db/dbconnection');
 const router = express.Router();
 const uuid = require("uuid");
 const knex = require("knex");
-const jwt=require("jsonwebtoken")
-const {signupvalidation,loginvalidation}=require('../../validation/validation');
-const { config } = require("dotenv");
-const jwtsecretkey="seretkey"
+const jwt = require("jsonwebtoken")
+const { signupvalidation, loginvalidation } = require('../../validation/validation');
+const jwtsecretkey = "seretkey"
 
 
 const signup = async (req, res) => {
@@ -35,7 +34,7 @@ const signup = async (req, res) => {
             return res.status(409).json({ msg: "This user already exists" });
         }
 
-        
+
         const passwordHash = await bcrypt.hash(req.body.password, 6);
 
 
@@ -62,18 +61,19 @@ const signup = async (req, res) => {
 
 const login = async (req, res) => {
     try {
-        
+
         const errors = validationResult(req);
-        
+
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
         }
 
-    
+
         const result = await knexdb('users')
             .select('*')
             .where('email', req.body.email);
 
+        console.log(result)
 
         if (result.length === 0) {
             return res.status(401).json({ msg: "Authentication required, user not found" });
@@ -81,17 +81,17 @@ const login = async (req, res) => {
 
         const user = result[0];
 
-        
+
         const passwordMatch = await bcrypt.compare(req.body.password, user.password);
 
         if (!passwordMatch) {
             return res.status(401).json({ msg: "Authentication error, password is incorrect" });
         }
 
-        
+
         const token = jwt.sign({ id: user.id }, jwtsecretkey, { expiresIn: '1h' });
 
-        
+
         return res.status(200).json({
             msg: "Logged in successfully",
             token,
@@ -106,17 +106,39 @@ const login = async (req, res) => {
 
 
 
+const getuser = async (req, res) => {
+    try {
+
+        if (
+            !req.headers.authorization ||
+            !req.headers.authorization.startsWith('Bearer') ||
+            !req.headers.authorization.split(' ')[1]) {
+            return res.status(422).json("please enter valid requerments")
+        }
+
+        const auth = await req.headers.authorization.split(' ')[1]
+        const decode = await jwt.verify(auth, jwtsecretkey)
+
+        const [user] = await knexdb('users')
+            .select('*')
+            .from('users')
+            .where('id', '=', decode.id)
+
+        console.log(user)
+
+        if (!user) return res.status(401).json("Aunathorized");
+
+         res.status(200).json({ success: true, data: user });
+
+      
+
+    }
+
+    catch (error) {
+        console.log("internel server error ")
+    }
+
+}
 
 
-// const midlewear=async(req,res)=>{
-
-//     const decode=jwt.verify(jwtsecretkey)
-//     const id=req.body.id
-//     console.log(decode)
-
-
-
-// }
-
-
-module.exports = { login,signup};
+module.exports = { login, signup, getuser };
