@@ -1,13 +1,13 @@
 const {check,validation}=require("express-validator")
 
 
-const signupvalidation=[
+const SignUpValiDation=[
     check('name','name is required').not().isEmpty(),
     check('email','email is required').not().isEmpty(),
     check('password','password is required').isLength({main:6})
 ]
 
-const loginvalidation=[
+const LoginValidation=[
     check('email','email is reuqeire').not().isEmpty(),
     check('password','password is requeired').isLength({min:6})
 ]
@@ -15,4 +15,4 @@ const loginvalidation=[
 
 
 
-module.exports={signupvalidation,loginvalidation}
+module.exports={SignUpValiDation,LoginValidation}

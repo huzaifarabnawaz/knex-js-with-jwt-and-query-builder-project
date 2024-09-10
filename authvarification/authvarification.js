@@ -3,7 +3,7 @@ const { jwtsecretkey } = require('../constants');
 const knexdb = require("../db/dbconnection");
 const knex = require("knex");
 
-const isauth = async (req, res, next) => {
+const isAuth = async (req, res, next) => {
 
     try {
 
@@ -21,18 +21,18 @@ const isauth = async (req, res, next) => {
         const { id } = decode
 
         const user = await knexdb('users')
-            .select('*')
-            .from('users')
-            .where('id', '=', id)
+        .where('id', id)
+        .first();
 
+                console.log("midddlerware user",user)
             req.user = user
-
+console.log()
 
         next()
 
     }
     catch (error) {
-        console.log('in error block')
+        console.log( "middleware" ,error)
         console.log("internel server")
         throw error
     }
@@ -40,4 +40,4 @@ const isauth = async (req, res, next) => {
 
 }
 
-module.exports = { isauth }
+module.exports = {isAuth}

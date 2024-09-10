@@ -1,18 +1,17 @@
 
 const express = require("express");
 const bcrypt = require('bcrypt');
-const { validationResult, } = require("express-validator");
+const { validationResult} = require("express-validator");
 const knexdb = require('../../db/dbconnection');
-const router = express.Router();
 const uuid = require("uuid");
 const knex = require("knex");
 const jwt = require("jsonwebtoken")
 const { signupvalidation, loginvalidation } = require('../../validation/validation');
-const {jwtsecretkey}=require('../../constants')
+const { jwtsecretkey } = require('../../constants')
 
 
 
-const signup = async (req, res) => {
+const signUp = async (req, res) => {
 
     try {
         const errors = validationResult(req);
@@ -21,15 +20,14 @@ const signup = async (req, res) => {
             return res.status(400).json({ errors: errors.array() });
         }
 
-        const email = req.body.email
+        const email = req.body.email;
 
-        console.log(email)
 
 
         const result = await knexdb('users')
-            .where('email', '=', email).select('email')
+            .where('email', '=', email)
+            .select('email')
 
-        console.log(result)
 
         if (result.length > 0) {
             return res.status(409).json({ msg: "This user already exists" });
@@ -48,7 +46,8 @@ const signup = async (req, res) => {
         });
 
 
-        res.status(201).json({ msg: "User has been registered successfully" });
+
+        res.status(201).json({ msg: "User has been registered successfully", });
 
     } catch (error) {
         console.error(error);
@@ -56,6 +55,7 @@ const signup = async (req, res) => {
     }
 
 };
+
 
 
 
@@ -74,9 +74,8 @@ const login = async (req, res) => {
 
         const result = await knexdb('users')
             .select('*')
-            .where('email','=', req.body.email);
+            .where('email', '=', req.body.email);
 
-        console.log(result)
 
         if (result.length === 0) {
             return res.status(401).json({ msg: "Authentication required, user not found" });
@@ -92,8 +91,9 @@ const login = async (req, res) => {
         }
 
 
-        const token = jwt.sign({ id: user.id }, jwtsecretkey, { expiresIn: '2h' });
+        const token = jwt.sign({ id: user.id }, jwtsecretkey,{expiresIn:"8h"});
 
+        
 
         return res.status(200).json({
             msg: "Logged in successfully",
@@ -101,7 +101,8 @@ const login = async (req, res) => {
             user: { id: user.id, email: user.email, name: user.name }
         });
 
-    } catch (error) {
+    } 
+    catch (error) {
         console.error("Internal server error:", error);
         res.status(500).json({ msg: "Server error" });
     }
@@ -111,12 +112,10 @@ const login = async (req, res) => {
 
 
 
+const getUser = async (req, res) => {
+    try {
 
-
-const getuser = async (req, res) => {
-    try {    
-
-         res.status(200).json({ success: true, payload: req.user });
+        res.status(200).json({ success: true, payload: req.user });
 
     }
 
@@ -131,4 +130,11 @@ const getuser = async (req, res) => {
 
 
 
-module.exports = { login, signup, getuser};
+module.exports = { login, signUp, getUser };
+
+
+// {
+//     "name":"noman",
+//     "email":"noman@gmail.com",
+//     "password":"676767"
+// }
