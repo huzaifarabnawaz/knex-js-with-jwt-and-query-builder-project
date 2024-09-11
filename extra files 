@@ -29,3 +29,43 @@
 // });
 
 // module.exports = router;
+
+
+
+
+
+
+const bcrypt = require('bcrypt');
+
+router.put('/', auth, async (req, res) => {
+  const userId = req.user.id;
+  const { name, email, password } = req.body;
+
+  if (!name && !email && !password) {
+    return res.status(400).json({ error: 'At least one field must be provided for update' });
+  }
+
+  let updatedData = {};
+
+  if (name) updatedData.name = name;
+  if (email) updatedData.email = email;
+  if (password) {
+    const salt = await bcrypt.genSalt(10);
+    updatedData.password = await bcrypt.hash(password, salt);
+  }
+
+  
+    const updatedUser = await knex('users')
+      .where({ id: userId })
+      .update(updatedData, ['id', 'name', 'email']);
+
+    if (!updatedUser) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.status(200).json({ message: 'User updated successfully', user: updatedUser });
+   
+
+    res.status(500).json({ message: 'Internal server error' });
+  
+});

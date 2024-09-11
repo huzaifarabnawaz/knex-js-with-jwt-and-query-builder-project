@@ -3,7 +3,9 @@ const { validationResult } = require("express-validator")
 const knexdb = require("../../db/dbconnection")
 const { isAuth } = require("../../authvarification/authvarification")
 const uuid = require("uuid");
+const bcrypt=require("bcrypt")
 const { name } = require('../../constants');
+const knex = require('knex');
 
 const posts = async (req, res) => {
 
@@ -187,5 +189,31 @@ const deletePost = async (req, res) => {
 }
 
 
+const updateuser =async (req,res)=>{
+    try{
 
-module.exports = { posts, getBypost, postId, deletePost }
+    const userid=req.user.id
+    const {name,email,password}=req.body
+     
+    if(!name && !email && password){
+        res.status(401).json({msg:"at least one field provided"})
+    }
+
+    const updateuser=await knexdb('users')
+    knexdb.where('id','=',userid)
+    .update('')
+    
+
+
+    }
+    catch(error){
+        console.log(error)
+        console.log("internel server error")
+        throw error
+    }
+
+
+}
+
+
+module.exports = { posts, getBypost, postId, deletePost,updateuser }
