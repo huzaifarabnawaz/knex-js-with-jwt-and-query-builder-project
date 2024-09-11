@@ -24,9 +24,8 @@ const isAuth = async (req, res, next) => {
         .where('id', id)
         .first();
 
-                console.log("midddlerware user",user)
+
             req.user = user
-console.log()
 
         next()
 

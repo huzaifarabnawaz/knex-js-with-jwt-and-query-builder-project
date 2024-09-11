@@ -1,46 +1,31 @@
+// const express = require('express');
+// const router = express.Router();
+// const knex = require('../db/knex'); 
+// const auth = require('../middleware/auth'); 
 
-const jwt = require('jsonwebtoken');
+// // GET /posts?id=1 - Get a post by its ID
+// router.get('/', auth, async (req, res) => {
+//   const postId = req.query.id;
 
-// JWT authentication middleware
-module.exports = function (req, res, next) {
-  const token = req.header('Authorization')?.split(' ')[1];
+//   // Check if `id` query param exists
+//   if (!postId) {
+//     return res.status(400).json({ error: 'Post ID is required' });
+//   }
 
-  if (!token) {
-    return res.status(401).json({ msg: 'No token, authorization denied' });
-  }
+//   try {
+//     const post = await knex('posts')
+//       .where({ id: postId, user_id: req.user.id }) 
+//       .first(); // Get the first matching post
 
-  try {
-    const decoded = jwt.verify(token, 'your_jwt_secret_key'); // Replace with your actual secret
-    req.user = decoded; // Save the user info in the request object
-    next();
-  } catch (err) {
-    res.status(401).json({ msg: 'Token is not valid' });
-  }
-};
+//     if (!post) {
+//       return res.status(404).json({ error: 'Post not found' });
+//     }
 
+//     res.status(200).json(post);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ error: 'Failed to fetch post' });
+//   }
+// });
 
-
-
-
-const express = require('express');
-const router = express.Router();
-const knex = require('../db/knex'); // Adjust path to your knex config
-const auth = require('../middleware/auth'); // Import your JWT authentication middleware
-
-// GET /posts - Get all posts for the authenticated user
-router.get('/', auth, async (req, res) => {
-  const userId = req.user.id; // This comes from the JWT token
-
-  try {
-    const userPosts = await knex('posts')
-      .where({ user_id: userId })
-      .select('id', 'title', 'content', 'created_at', 'updated_at'); // Select relevant columns
-
-    res.status(200).json(userPosts);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to fetch posts' });
-  }
-});
-
-module.exports = router;
+// module.exports = router;
