@@ -132,7 +132,7 @@ const getUser = async (req, res) => {
 
 
 
-const upDateUsersfields = async (req, res) => {
+const updateUsersFields = async (req, res) => {
     try {
 
         const user = req.user
@@ -180,7 +180,7 @@ const upDateUsersfields = async (req, res) => {
 
 }
 
-module.exports = { login, signUp, getUser, upDateUsersfields };
+module.exports = { login, signUp, getUser, updateUsersFields };
 
 
 

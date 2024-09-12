@@ -7,6 +7,7 @@ const bcrypt=require("bcrypt")
 const { name } = require('../../constants');
 const knex = require('knex');
 
+
 const posts = async (req, res) => {
 
     const error = validationResult(req)
@@ -52,20 +53,13 @@ const posts = async (req, res) => {
 
 
 
-
-
-
-
-
-
-
-const getBypost = async (req, res) => {
+const getByusers = async (req, res) => {
 
     try {
 
         const user = req.user
 
-        // console.log(user)
+        
 
         const getByUser = await knexdb('posts')
             .where('user_id', '=', user.id)
@@ -87,19 +81,7 @@ const getBypost = async (req, res) => {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-const postId = async (req, res) => {
+const postByUser= async (req, res) => {
     try {
 
         const id = req.params.id
@@ -191,4 +173,36 @@ const deletePost = async (req, res) => {
 
 
 
-module.exports = { posts, getBypost, postId, deletePost}
+const updatePost=async(req,res)=>{
+try{
+
+const id=req.params
+
+const {title,content}=req.body
+
+if(!id){
+    return res.status(404).json({msg:"user id not found"})
+}
+ 
+const posts=await knexdb('posts')
+.where(id)
+.update({title:title,content:content})
+
+console.log(posts)
+
+if(!posts){
+    return res.status(404).json({msg:'posts not found'})
+}
+
+return res.status(200).json({msg:"post updated"})
+
+}
+catch(error){
+    console.log(error)
+    console.log('internel server error ')
+    throw error
+}
+
+}
+    
+module.exports = { posts,getByusers,postByUser, deletePost,updatePost}
