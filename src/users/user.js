@@ -1,13 +1,14 @@
 
 const express = require("express");
 const bcrypt = require('bcrypt');
-const { validationResult} = require("express-validator");
+const { validationResult } = require("express-validator");
 const knexdb = require('../../db/dbconnection');
 const uuid = require("uuid");
 const knex = require("knex");
 const jwt = require("jsonwebtoken")
 const { signupvalidation, loginvalidation } = require('../../validation/validation');
 const { jwtsecretkey } = require('../../constants')
+const { isAuth } = require("../../authvarification/authvarification")
 
 
 
@@ -91,9 +92,9 @@ const login = async (req, res) => {
         }
 
 
-        const token = jwt.sign({ id: user.id }, jwtsecretkey,{expiresIn:"88h"});
+        const token = jwt.sign({ id: user.id }, jwtsecretkey);
 
-        
+
 
         return res.status(200).json({
             msg: "Logged in successfully",
@@ -101,7 +102,7 @@ const login = async (req, res) => {
             user: { id: user.id, email: user.email, name: user.name }
         });
 
-    } 
+    }
     catch (error) {
         console.error("Internal server error:", error);
         res.status(500).json({ msg: "Server error" });
@@ -130,7 +131,58 @@ const getUser = async (req, res) => {
 
 
 
-module.exports = { login, signUp, getUser };
+
+const upDateUsersfields = async (req, res) => {
+    try {
+
+        const user = req.user
+        const { name, email, password } = req.body
+
+        if (!user) {
+            return res.status(404).json("user id not found")
+        }
+
+
+        if (!name && !email && !password) {
+            return res.status(401).json({ msg: "please provides fields" })
+        }
+
+
+        const userUpDates = {}
+        if (name) userUpDates.name = name;
+        if (email) userUpDates.email = email;
+        if(password){
+            const salt=await bcrypt.genSalt(10);
+            userUpDates.password=await bcrypt.hash(password,salt)
+        }
+
+
+        const upDateUsersData = await knexdb('users').where('id', user.id)
+        .update(userUpDates)
+       
+
+
+        if (!upDateUsersData) {
+            return res.status(404).json({ msg: "users not update " })
+        }
+
+        console.log(upDateUsersData)
+
+        return res.status(200).json("user hase been updated")
+
+    }
+    catch (error) {
+        console.log(error)
+        console.log("internel server error")
+        throw error
+    }
+
+
+}
+
+module.exports = { login, signUp, getUser, upDateUsersfields };
+
+
 
 
 // {

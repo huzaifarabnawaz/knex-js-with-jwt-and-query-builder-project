@@ -189,31 +189,6 @@ const deletePost = async (req, res) => {
 }
 
 
-const updateuser =async (req,res)=>{
-    try{
-
-    const userid=req.user.id
-    const {name,email,password}=req.body
-     
-    if(!name && !email && password){
-        res.status(401).json({msg:"at least one field provided"})
-    }
-
-    const updateuser=await knexdb('users')
-    knexdb.where('id','=',userid)
-    .update('')
-    
 
 
-    }
-    catch(error){
-        console.log(error)
-        console.log("internel server error")
-        throw error
-    }
-
-
-}
-
-
-module.exports = { posts, getBypost, postId, deletePost,updateuser }
+module.exports = { posts, getBypost, postId, deletePost}
