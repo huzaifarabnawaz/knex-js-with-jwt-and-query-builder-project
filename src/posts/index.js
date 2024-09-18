@@ -1,12 +1,12 @@
 const express = require("express")
-const {posts,getByusers,postByUser, deletePost,updatePost} = require("./posts")
+const {posts,userPost,getingUsers, deletePost,updatePost} = require("./posts")
 const{isAuth}=require("../../authvarification/authvarification")
 const router = express.Router()
 
 
 router.post("/posts",isAuth,posts)
-router.get("/getbypost", isAuth,getByusers)
-router.get("/:id",isAuth,postByUser)
+router.get("/getbypost",getingUsers,)
+router.get("/:id",isAuth,userPost)
 router.delete("/:id",isAuth,deletePost)
 router.patch("/:id",isAuth,updatePost)
 

@@ -116,7 +116,10 @@ const login = async (req, res) => {
 const getUser = async (req, res) => {
     try {
 
-        res.status(200).json({ success: true, payload: req.user });
+        res.status(200).json({ success: true, payload:{
+            username:req.user.name,
+            useremail:req.user.email
+        }});
 
     }
 
@@ -180,7 +183,7 @@ const updateUsersFields = async (req, res) => {
 
 }
 
-module.exports = { login, signUp, getUser, updateUsersFields };
+module.exports = { login, signUp,getUser, updateUsersFields };
 
 
 
@@ -189,4 +192,4 @@ module.exports = { login, signUp, getUser, updateUsersFields };
 //     "name":"noman",
 //     "email":"noman@gmail.com",
 //     "password":"676767"
-// }
+// }    

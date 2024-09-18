@@ -53,7 +53,7 @@ const posts = async (req, res) => {
 
 
 
-const getByusers = async (req, res) => {
+const getingUsers = async (req, res) => {
 
     try {
 
@@ -81,10 +81,11 @@ const getByusers = async (req, res) => {
 
 
 
-const postByUser= async (req, res) => {
+const userPost= async (req, res) => {
     try {
 
         const id = req.params.id
+    
 
 
         if (!id) {
@@ -102,7 +103,7 @@ const postByUser= async (req, res) => {
             )
             .where('posts.id', id)
             .first();
-
+            
 
         const result = {
             id: post.id,
@@ -205,4 +206,4 @@ catch(error){
 
 }
     
-module.exports = { posts,getByusers,postByUser, deletePost,updatePost}
+module.exports = { posts,getingUsers,userPost,deletePost,updatePost}
