@@ -106,12 +106,12 @@ const userPost= async (req, res) => {
             
 
         const result = {
-            id: post.id,
-            title: post.title,
-            content: post.content,
+            id: posts.id,
+            title: posts.title,
+            content: posts.content,
             user: {
-                name: post.user_name,
-                email: post.user_email
+                name: posts.user_name,
+                email: posts.user_email
             }
         }
 
@@ -141,8 +141,6 @@ const deletePost = async (req, res) => {
 
         const postId = req.params.id
 
-        console.log(req.user.id)
-
         console.log(postId)
 
         if (!postId) {
@@ -170,8 +168,6 @@ const deletePost = async (req, res) => {
     }
 
 }
-
-
 
 
 const updatePost=async(req,res)=>{
@@ -206,4 +202,4 @@ catch(error){
 
 }
     
-module.exports = { posts,getingUsers,userPost,deletePost,updatePost}
+module.exports = { posts,getingUsers,userPost, deletePost,updatePost}

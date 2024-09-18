@@ -4,7 +4,7 @@ const{isAuth}=require("../../authvarification/authvarification")
 const router = express.Router()
 
 
-router.post("/posts",isAuth,posts)
+router.post("/",isAuth,posts)
 router.get("/getbypost",getingUsers,)
 router.get("/:id",isAuth,userPost)
 router.delete("/:id",isAuth,deletePost)

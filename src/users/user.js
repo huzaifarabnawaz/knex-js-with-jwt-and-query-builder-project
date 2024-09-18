@@ -60,9 +60,6 @@ const signUp = async (req, res) => {
 
 
 
-
-
-
 const login = async (req, res) => {
     try {
 
@@ -116,10 +113,12 @@ const login = async (req, res) => {
 const getUser = async (req, res) => {
     try {
 
-        res.status(200).json({ success: true, payload:{
-            username:req.user.name,
-            useremail:req.user.email
-        }});
+        res.status(200).json({
+            success: true, payload: {
+                username: req.user.name,
+                useremail: req.user.email
+            }
+        });
 
     }
 
@@ -154,15 +153,15 @@ const updateUsersFields = async (req, res) => {
         const userUpDates = {}
         if (name) userUpDates.name = name;
         if (email) userUpDates.email = email;
-        if(password){
-            const salt=await bcrypt.genSalt(10);
-            userUpDates.password=await bcrypt.hash(password,salt)
+        if (password) {
+            const salt = await bcrypt.genSalt(10);
+            userUpDates.password = await bcrypt.hash(password, salt)
         }
 
 
         const upDateUsersData = await knexdb('users').where('id', user.id)
-        .update(userUpDates)
-       
+            .update(userUpDates)
+
 
 
         if (!upDateUsersData) {
@@ -183,7 +182,43 @@ const updateUsersFields = async (req, res) => {
 
 }
 
-module.exports = { login, signUp,getUser, updateUsersFields };
+
+
+const reqResetPassword = async (req, res) => {
+    try {
+      const { email } = req.body;
+  
+      // Fetch user from the database
+      const result = await knexdb('users')
+        .select('*')
+        .where('email', email);
+  
+      // If no user found, return 401
+      if (result.length === 0) {
+        return res.status(401).json({ msg: "Email not found" });
+      }
+  
+      const user = result[0];
+  
+      // Generate JWT token
+      const token = jwt.sign({ id: user.id }, jwtsecretkey);
+  
+      // Send response with token and user email
+      return res.status(200).json({
+        msg: "Your request has been accepted",
+        token,
+        payload: { useremail:user.email }
+      });
+  
+    } catch (error) {
+      console.error("Internal server error", error);
+      return res.status(500).json({ msg: "Internal server error" });
+    }
+  };
+  
+
+
+module.exports = { login, signUp, getUser, updateUsersFields,reqResetPassword};
 
 
 

@@ -108,5 +108,24 @@ const getCommentsByFilter = async (req, res) => {
 
 
 
+const deleteComments=async(req,res)=>{
 
-module.exports = { insertComments, getUserComments, getCommentsByFilter}
+    const commentId=req.params.id
+
+    if(!commentId){
+        res.status(404).json({msg:"commentid not found"})
+    }
+
+    const deleteQuery=await knexdb('comments')
+    .where('comments.id',commentId)     
+    .delete();
+
+    if(!deleteQuery){
+        res.status(404).json({msg:"comment not found"})
+    }
+
+    res.status(200).json({payload:deleteQuery})
+}
+
+
+module.exports = { insertComments, getUserComments,getCommentsByFilter,deleteComments}
