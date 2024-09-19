@@ -9,7 +9,7 @@ const jwt = require("jsonwebtoken")
 const { signupvalidation, loginvalidation } = require('../../validation/validation');
 const { jwtsecretkey } = require('../../constants')
 const { isAuth } = require("../../authvarification/authvarification")
-
+const otppassword = require('crypto')
 
 
 const signUp = async (req, res) => {
@@ -184,41 +184,110 @@ const updateUsersFields = async (req, res) => {
 
 
 
-const reqResetPassword = async (req, res) => {
+
+
+const verifiedEmail = async (req, res) => {
     try {
-      const { email } = req.body;
-  
-      // Fetch user from the database
-      const result = await knexdb('users')
-        .select('*')
-        .where('email', email);
-  
-      // If no user found, return 401
-      if (result.length === 0) {
-        return res.status(401).json({ msg: "Email not found" });
-      }
-  
-      const user = result[0];
-  
-      // Generate JWT token
-      const token = jwt.sign({ id: user.id }, jwtsecretkey);
-  
-      // Send response with token and user email
-      return res.status(200).json({
-        msg: "Your request has been accepted",
-        token,
-        payload: { useremail:user.email }
-      });
-  
-    } catch (error) {
-      console.error("Internal server error", error);
-      return res.status(500).json({ msg: "Internal server error" });
+
+        const { email } = req.body
+
+        const otp = otppassword.randomInt(100000, 999999)
+
+        const userId = await knexdb('users')
+            .where('email', email)
+            .update('otp', otp);
+
+        console.log(userId)
+
+        if (!userId) {
+            res.status(404).json({ msg: "email not found" })
+        }
+
+        return res.status(200).json({ msg: "you request hase been submitted" })
     }
-  };
-  
+    catch (error) {
+        console.log(error)
+        console.log("internel server error ")
+        throw error
+    }
+}
 
 
-module.exports = { login, signUp, getUser, updateUsersFields,reqResetPassword};
+
+
+const verifiedOtp = async (req, res) => {
+    try {
+
+        const {otp} = req.body
+
+        const user = await knexdb('users')
+            .where('otp', otp);
+
+            console.log(user)
+
+        if (!user) {
+            res.status(404).json({ msg: "email and otp not found" })
+        }
+
+        const token = jwt.sign({ id: user[0].id}, jwtsecretkey)
+
+        res.status(200).json({ token: token })
+
+    }
+
+    catch (error) {
+        console.log(error)
+        console.log("internel server")
+        throw error
+    }
+
+
+}
+
+
+
+const changePassword = async (req, res) => {
+    try {
+
+        const {newpassword}=req.body
+
+        const {id}=req.user
+
+
+        const user = await knexdb('users')
+            .where('id', id)
+            .first()
+
+
+        if (!user) {
+            res.status(404).json({ msg: "token not found" })
+        }
+
+
+        const hashpassword = await bcrypt.hash(newpassword, 10)
+
+        const savePassword = await knexdb('users')
+            .where('id', id)
+            .update('password', hashpassword)
+
+
+        if (!savePassword) {
+            res.status(404).json({ msg: "user id not found" })
+        }
+
+        res.status(200).json({ msg: "user password hase been changed" })
+
+    }
+
+    catch (error) {
+        console.log(error)
+        console.log("internel server error")
+        throw error
+    }
+
+}
+
+module.exports = { login, signUp, getUser, updateUsersFields, verifiedEmail, verifiedOtp, changePassword };
 
 
 

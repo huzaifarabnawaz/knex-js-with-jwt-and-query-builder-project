@@ -7,8 +7,6 @@
            table.uuid('id').unique()
            table.string("name").notNullable()
            table.string("email").unique()
-            table.integer('otp').notNullable();
-            table.bigint('otp_expire').notNullable();
            table.string("password").notNullable()
         
        })
