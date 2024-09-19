@@ -51,8 +51,6 @@ const posts = async (req, res) => {
 }
 
 
-
-
 const getingUsers = async (req, res) => {
 
     try {
@@ -77,8 +75,6 @@ const getingUsers = async (req, res) => {
     }
 
 }
-
-
 
 
 const userPost= async (req, res) => {
@@ -132,8 +128,6 @@ const userPost= async (req, res) => {
 
 
 }
-
-
 
 
 const deletePost = async (req, res) => {

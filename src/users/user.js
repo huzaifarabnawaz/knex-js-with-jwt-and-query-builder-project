@@ -58,8 +58,6 @@ const signUp = async (req, res) => {
 };
 
 
-
-
 const login = async (req, res) => {
     try {
 
@@ -108,8 +106,6 @@ const login = async (req, res) => {
 
 
 
-
-
 const getUser = async (req, res) => {
     try {
 
@@ -129,9 +125,6 @@ const getUser = async (req, res) => {
     }
 
 }
-
-
-
 
 
 const updateUsersFields = async (req, res) => {
@@ -184,8 +177,6 @@ const updateUsersFields = async (req, res) => {
 
 
 
-
-
 const verifiedEmail = async (req, res) => {
     try {
 
@@ -211,7 +202,6 @@ const verifiedEmail = async (req, res) => {
         throw error
     }
 }
-
 
 
 
@@ -287,13 +277,9 @@ const changePassword = async (req, res) => {
 
 }
 
+
+
+
 module.exports = { login, signUp, getUser, updateUsersFields, verifiedEmail, verifiedOtp, changePassword };
 
 
-
-
-// {
-//     "name":"noman",
-//     "email":"noman@gmail.com",
-//     "password":"676767"
-// }    
