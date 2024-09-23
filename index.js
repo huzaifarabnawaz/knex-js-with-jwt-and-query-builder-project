@@ -5,6 +5,7 @@ app.use(express.json())
 const users = require('./src/users')
 const post=require("./src/posts")
 const comments=require("./src/comments")
+const uploadimg=require("./cloudinary/multer")
 
 app.use('/user',users)
 app.use("/post",post)

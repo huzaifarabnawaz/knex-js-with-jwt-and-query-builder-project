@@ -10,7 +10,9 @@ const { signupvalidation, loginvalidation } = require('../../validation/validati
 const { jwtsecretkey } = require('../../constants')
 const { isAuth } = require("../../authvarification/authvarification")
 const otppassword = require('crypto')
-
+const multer = require('../../cloudinary/multer')
+const cloudinary = require('../../cloudinary/cloudinary');
+const fs = require('fs');
 
 const signUp = async (req, res) => {
 
@@ -105,7 +107,6 @@ const login = async (req, res) => {
 };
 
 
-
 const getUser = async (req, res) => {
     try {
 
@@ -176,7 +177,6 @@ const updateUsersFields = async (req, res) => {
 }
 
 
-
 const verifiedEmail = async (req, res) => {
     try {
 
@@ -208,18 +208,18 @@ const verifiedEmail = async (req, res) => {
 const verifiedOtp = async (req, res) => {
     try {
 
-        const {otp} = req.body
+        const { otp } = req.body
 
         const user = await knexdb('users')
             .where('otp', otp);
 
-            console.log(user)
+        console.log(user)
 
         if (!user) {
             res.status(404).json({ msg: "email and otp not found" })
         }
 
-        const token = jwt.sign({ id: user[0].id}, jwtsecretkey)
+        const token = jwt.sign({ id: user[0].id }, jwtsecretkey)
 
         res.status(200).json({ token: token })
 
@@ -239,9 +239,9 @@ const verifiedOtp = async (req, res) => {
 const changePassword = async (req, res) => {
     try {
 
-        const {newpassword}=req.body
+        const { newpassword } = req.body
 
-        const {id}=req.user
+        const { id } = req.user
 
 
         const user = await knexdb('users')
@@ -278,8 +278,78 @@ const changePassword = async (req, res) => {
 }
 
 
+const matchPasswordAndChange = async (req, res) => {
+    try {
+        const { comparepassword, newpassword } = req.body;
+        const { id, password } = req.user
+        const matchUserPassword = await bcrypt.compare(comparepassword, password)
+        if (!matchUserPassword) {
+            res.status(404).json({ msg: "password not matched" });
+            return;
+        }
+        const hashPassword = await bcrypt.hash(newpassword, 6);
+        const matchPassword = await knexdb('users')
+            .where('id', id)
+            .update('password', hashPassword)
+
+        if (matchPassword === 0) {
+            res.status(404).json({ msg: "password changed" });
+            return;
+        }
+
+        return res.status(200).json({ data: matchPassword })
+
+    } catch (error) {
+        console.error(error);
+        throw error
+    }
+};
 
 
-module.exports = { login, signUp, getUser, updateUsersFields, verifiedEmail, verifiedOtp, changePassword };
 
+const uploadImage = async (req, res) => {
+    try {
+        console.log(req.file)
+        if (!req.file.buffer) {
+            return res.json({ msg: "No file found" })
+        }
+        const result = await new Promise((resolve, reject) => {
+            const stream = cloudinary.uploader.upload_stream({ resource_type: 'image' }, (error, result) => {
+                if (error) {
+                    res.status(404).json({ msg:" image file not found "})
+                    return reject(error);
+                }
+                    return resolve(result);
+                
+            });
+
+            return stream.end(req.file.buffer);
+        });
+
+
+        const imageDatabase = await knexdb('images').insert({
+            image_url: result.secure_url,
+            user_id: req.user.id
+        })
+
+        if(!imageDatabase){
+            return res.status(404).json({msg:"data base error"})
+        }
+
+        res.status(200).json({
+            msg: "Image uploaded and saved successfully",
+            imageUrl: result.secure_url,
+
+        });
+
+    } catch (error) {
+        console.error("Error during image upload:", error);
+        res.status(500).json({ msg: "Internal server error" });
+        throw error
+    }
+};
+
+
+
+module.exports = { login, signUp, getUser, updateUsersFields, verifiedEmail, verifiedOtp, changePassword, matchPasswordAndChange, uploadImage };
 

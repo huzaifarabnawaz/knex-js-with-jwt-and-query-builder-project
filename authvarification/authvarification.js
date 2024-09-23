@@ -19,23 +19,20 @@ const isAuth = async (req, res, next) => {
 
         const auth = req.headers.authorization.split(' ')[1];
         const decode = jwt.verify(auth, jwtsecretkey)
-        
-        console.log(decode)
+
 
         const { id } = decode
 
         const user = await knexdb('users')
-        .where('id', id)
-        .first();
-
-
-            req.user = user
+            .where('id', id)
+            .first();
+        req.user = user
 
         next()
 
     }
     catch (error) {
-        console.log( "middleware" ,error)
+        console.log("middleware", error)
         console.log("internel server")
         throw error
     }
@@ -43,4 +40,4 @@ const isAuth = async (req, res, next) => {
 
 }
 
-module.exports = {isAuth}
+module.exports = { isAuth }
