@@ -326,7 +326,6 @@ const uploadImage = async (req, res) => {
             return stream.end(req.file.buffer);
         });
 
-
         const imageDatabase = await knexdb('images').insert({
             image_url: result.secure_url,
             user_id: req.user.id
