@@ -204,7 +204,6 @@ const verifiedEmail = async (req, res) => {
 }
 
 
-
 const verifiedOtp = async (req, res) => {
     try {
 
@@ -309,12 +308,21 @@ const matchPasswordAndChange = async (req, res) => {
 
 const uploadImage = async (req, res) => {
     try {
-        console.log(req.file)
-        if (!req.file.buffer) {
+        if (!req.file || !req.file.buffer) {
             return res.json({ msg: "No file found" })
         }
+
         const result = await new Promise((resolve, reject) => {
             const stream = cloudinary.uploader.upload_stream({ resource_type: 'image' }, (error, result) => {
+             
+                if(!result){
+                    return res.status(404).json({msg:"image source not found"})
+                }
+
+                if(!stream){
+                return res.status(404).json({msg:"image files not send"})
+                }
+             
                 if (error) {
                     res.status(404).json({ msg:" image file not found "})
                     return reject(error);
@@ -325,6 +333,7 @@ const uploadImage = async (req, res) => {
 
             return stream.end(req.file.buffer);
         });
+
 
         const imageDatabase = await knexdb('images').insert({
             image_url: result.secure_url,
@@ -349,6 +358,31 @@ const uploadImage = async (req, res) => {
 };
 
 
+const getApiWithUserData=async (req,res)=>{
+    try{
+    const {id}=req.params
 
-module.exports = { login, signUp, getUser, updateUsersFields, verifiedEmail, verifiedOtp, changePassword, matchPasswordAndChange, uploadImage };
+
+    const dataBase= await knexdb("images")
+        .innerJoin('users','users.id','=','images.user_id')
+        .where('images.user_id',id)   
+        .select('users.name','users.email','image_url',)
+    
+
+        if(!dataBase){
+            return res.status(404).json({msg:"data not found"})
+        }
+
+        res.status(200).json({payload:dataBase})
+
+    }
+    catch(error){
+        console.log(error)
+        console.log("internel server error")
+        throw error
+    }
+}
+
+
+module.exports = { login, signUp, getUser, updateUsersFields, verifiedEmail, verifiedOtp, changePassword, matchPasswordAndChange,uploadImage,getApiWithUserData};
 

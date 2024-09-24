@@ -15,7 +15,6 @@ const isAuth = async (req, res, next) => {
             return res.status(401).json("please enter valid Credentials")
         }
 
-        console.log(req.headers.authorization)
 
         const auth = req.headers.authorization.split(' ')[1];
         const decode = jwt.verify(auth, jwtsecretkey)
