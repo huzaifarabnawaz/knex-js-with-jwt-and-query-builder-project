@@ -308,12 +308,22 @@ const matchPasswordAndChange = async (req, res) => {
 
 const uploadImage = async (req, res) => {
     try {
+        const {originalname}=req.file
+        console.log(req.file.originalname)
+
         if (!req.file || !req.file.buffer) {
             return res.json({ msg: "No file found" })
         }
 
         const result = await new Promise((resolve, reject) => {
-            const stream = cloudinary.uploader.upload_stream({ resource_type: 'image' }, (error, result) => {
+            const stream = cloudinary.uploader.upload_stream({ 
+                resource_type:"image",
+                folder:"Pictures",
+                use_filename:true,
+                public_id:originalname.split('.')[0],
+                overwrite:true,
+            },
+                 (error, result) => {
              
                 if(!result){
                     return res.status(404).json({msg:"image source not found"})
@@ -331,6 +341,7 @@ const uploadImage = async (req, res) => {
                 
             });
 
+
             return stream.end(req.file.buffer);
         });
 
@@ -346,7 +357,7 @@ const uploadImage = async (req, res) => {
 
         res.status(200).json({
             msg: "Image uploaded and saved successfully",
-            imageUrl: result.secure_url,
+            imageUrl: result.secure_url
 
         });
 
@@ -356,6 +367,8 @@ const uploadImage = async (req, res) => {
         throw error
     }
 };
+
+
 
 
 const getApiWithUserData=async (req,res)=>{
